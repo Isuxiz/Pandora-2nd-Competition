@@ -43,6 +43,7 @@ def create_app():
         }
         """
         import PIL
+        import json
         import requests
         from PIL import Image
         import base64
@@ -78,7 +79,7 @@ def create_app():
         encoder = hashlib.md5();
         encoder.update(originBytes)#.encode(encoding='utf-8'))
         md5Code = encoder.hexdigest()
-        return {"md5":md5Code,"base64_picture":bs64Code}
+        return json.dumps({"md5":md5Code,"base64_picture":bs64Code})
 
     # TODO: 爬取 996.icu Repo，获取企业名单
     @app.route('/996')
