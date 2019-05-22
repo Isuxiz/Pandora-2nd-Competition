@@ -18,8 +18,7 @@ def create_app():
         """
         以此项目中的404.html作为此Web Server工作时的404错误页
         """
-        user = User.query.first()
-        return render_template('404.html',user=user),404
+        return render_template("404.html"),404
 
     # TODO: 完成接受 HTTP_URL 的 picture_reshape
     # TODO: 完成接受相对路径的 picture_reshape
