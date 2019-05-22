@@ -114,17 +114,17 @@ def create_app():
             flag = i%5
             item = originalResult[i]
             if flag==0:
-                dictionary.update({'city':item})
+                dictionary.update({"city":item})
             elif flag==1:
                 templist = re.findall(r'>(.*)</a>',item)
                 if len(templist)==0:
-                    dictionary.update({'company':item})
+                    dictionary.update({"company":item})
                 else:
-                    dictionary.update({'company':templist[0]})
+                    dictionary.update({"company":templist[0]})
             elif flag==2:
-                dictionary.update({'exposure_time':item})
+                dictionary.update({"exposure_time":item})
             elif flag==3:
-                dictionary.update({'description':item})
+                dictionary.update({"description":item})
             elif flag==4:
                 ansList.append(dictionary.copy())
                 dictionary.clear()
