@@ -62,7 +62,7 @@ def create_app():
 
         #get base64
         #if xxx.txt
-        if "img" is b64_url or "img" is text:
+        if "img" is b64_url or "img" is text or "img.txt" is b64_url or "img.txt" is text:
             file0 = open("img.txt","rb")
             b64 = file0.read()
             file0.close()
