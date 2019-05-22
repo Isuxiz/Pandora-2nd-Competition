@@ -1,10 +1,13 @@
 from flask import Flask
 from flask import abort
 from flask import redirect
+from flask import request
+from flask import render_template
+
 def create_app():
     app = Flask(__name__)
 
-    @app.route('/<string:url>')
+    @app.route('/<path:url>')
     def abort404(url):
         if url not in {'pic','996',''}:
             abort(404)
@@ -56,7 +59,7 @@ def create_app():
         import base64
         import hashlib
         #get base64
-        #if .txt
+        #if xxx.txt
         if "http" not in b64_url:
             if ".txt" in b64_url:
                 file0 = open(b64_url,"rb")
