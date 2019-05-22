@@ -54,33 +54,32 @@ def create_app():
         }
         """
         import PIL
-        import requests
         from PIL import Image
         import base64
         import hashlib
+
+        text = request.args.get('b64_url')
+
         #get base64
         #if xxx.txt
-        if "http" not in b64_url:
-            if ".txt" in b64_url:
-                file0 = open(b64_url,"rb")
-            else:
-                file0 = open(b64_url+"txt","rb")
+        if "img" in text:
+            file0 = open("img.txt","rb")
             b64 = file0.read()
             file0.close()
         #if url
         else:
-            b64=requests.get(b64_url).content
+            b64 = text
         #decode to jpg
         imgdata=base64.b64decode(b64)  
-        file1=open("img.jpg","wb")  
+        file1=open("img.png","wb")  
         file1.write(imgdata)  
         file1.close()
         #reshape&save:
-        img = Image.open("img.jpg")
+        img = Image.open("img.png")
         out = img.resize((100, 100),Image.ANTIALIAS)
-        out.save("img-reshaped.jpg", "jpg")
+        out.save("img-reshaped.png", "png")
         #get original bytes
-        file2 = open("img-reshaped.jpg", "rb")
+        file2 = open("img-reshaped.png", "rb")
         originBytes = file2.read()
         file2.close()
         #change to b64
