@@ -44,11 +44,38 @@ def create_app():
         }
         """
         import PIL
-        if b64_url=="img.txt":
-            pass
+        from PIL import Image
+        import base64
+        import hashlib
+        #get base64
+        #if .txt
+        if ".txt" in b64_url:
+            file0 = open(b64_url,"rb")
+            b64 = file0.read()
+            file0.close()
+        #if url
         else:
-            pass
-        pass
+            b64=request.querystring("b64_url")
+        #decode to jpg
+        imgdata=base64.b64decode(b64)  
+        file1=open("img.jpg","wb")  
+        file1.write(imgdata)  
+        file1.close()
+        #reshape&save:
+        img = Image.open("img.jpg")
+        out = img.resize((100, 100),Image.ANTIALIAS)
+        out.save("img-reshaped.jpg", "jpg")
+        #get original bytes
+        file2 = open("img-reshaped.jpg", "rb")
+        originBytes = file2.read()
+        file2.close()
+        #change to b64
+        bs64Code = base64.b64encode(originBytes)
+        #change to md5
+        encoder = hashlib.md5();
+        encoder.update(originBytes)#.encode(encoding='utf-8'))
+        md5Code = encoder.hexdigest()
+        return {"md5":md5Code,"base64_picture":bs64Code}
 
     # TODO: 爬取 996.icu Repo，获取企业名单
     @app.route('/996')
