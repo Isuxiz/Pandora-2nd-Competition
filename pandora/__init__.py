@@ -18,7 +18,8 @@ def create_app():
         """
         以此项目中的404.html作为此Web Server工作时的404错误页
         """
-        return render_template('404.html'), 404
+        user = User.query.first()
+        return render_template('404.html',user=user)
 
     # TODO: 完成接受 HTTP_URL 的 picture_reshape
     # TODO: 完成接受相对路径的 picture_reshape
@@ -43,6 +44,10 @@ def create_app():
         }
         """
         import PIL
+        if b64_url=="img.txt":
+            pass
+        else:
+            pass
         pass
 
     # TODO: 爬取 996.icu Repo，获取企业名单
