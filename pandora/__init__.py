@@ -19,7 +19,7 @@ def create_app():
         以此项目中的404.html作为此Web Server工作时的404错误页
         """
         user = User.query.first()
-        return render_template('404.html',user=user)
+        return render_template('404.html',user=user),404
 
     # TODO: 完成接受 HTTP_URL 的 picture_reshape
     # TODO: 完成接受相对路径的 picture_reshape
@@ -44,18 +44,22 @@ def create_app():
         }
         """
         import PIL
+        import requests
         from PIL import Image
         import base64
         import hashlib
         #get base64
         #if .txt
-        if ".txt" in b64_url:
-            file0 = open(b64_url,"rb")
+        if "http" not in b64_url:
+            if ".txt" in b64_url:
+                file0 = open(b64_url,"rb")
+            else:
+                file0 = open(b64_url+"txt","rb")
             b64 = file0.read()
             file0.close()
         #if url
         else:
-            b64=request.querystring("b64_url")
+            b64=requests.get(b64_url).content
         #decode to jpg
         imgdata=base64.b64decode(b64)  
         file1=open("img.jpg","wb")  
