@@ -4,7 +4,7 @@ from flask import redirect
 def create_app():
     app = Flask(__name__)
 
-    @app.route('/<url>')
+    @app.route('/<string:url>')
     def abort404(url):
         if url not in {'pic','996',''}:
             abort(404)
