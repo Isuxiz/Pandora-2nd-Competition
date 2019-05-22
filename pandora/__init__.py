@@ -1,8 +1,15 @@
 from flask import Flask
-
-
+from flask import abort
+from flask import redirect
 def create_app():
     app = Flask(__name__)
+
+    @app.route('/<url>')
+    def abort404(url):
+        if url not in {'pic','996',''}:
+            abort(404)
+        else:
+            redirect('/'+url)
 
     @app.route('/')
     def index():
