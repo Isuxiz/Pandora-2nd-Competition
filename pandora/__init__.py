@@ -19,40 +19,40 @@ import requests
 import re
 
 def create_app():
-    app = Flask(__name__)
+	app = Flask(__name__)
 
-    @app.route('/<path:url>')
-    def abort404(url):
-        if url not in {'pic','996',''}:
-            abort(404)
-        else:
-            redirect('/'+url)
+	@app.route('/<path:url>')
+	def abort404(url):
+		if url not in {'pic','996',''}:
+			abort(404)
+		else:
+			redirect('/' + url)
 
-    @app.route('/')
-    def index():
-        """
-        只有 Hello World 的首页
-        :return:
-        """
-        return "Hello, world!"
+	@app.route('/')
+	def index():
+		"""
+		只有 Hello World 的首页
+		:return:
+		"""
+		return "Hello, world!"
 
-    # TODO: 捕获 404 错误，返回 404.html
-    @app.errorhandler(404)
-    def page_not_found(error):
-        """
-        以此项目中的404.html作为此Web Server工作时的404错误页
-        """
-        return render_template("404.html"),404
+	# TODO: 捕获 404 错误，返回 404.html
+	@app.errorhandler(404)
+	def page_not_found(error):
+		"""
+		以此项目中的404.html作为此Web Server工作时的404错误页
+		"""
+		return render_template("404.html"),404
 
-    # TODO: 完成接受 HTTP_URL 的 picture_reshape
-    # TODO: 完成接受相对路径的 picture_reshape
-    @app.route('/pic', methods=['GET'])
-    def picture_reshape(b64_url):
-        """
-        **请使用 PIL 进行本函数的编写**
-        获取请求的 query_string 中携带的 b64_url 值
-        从 b64_url 下载一张图片的 base64 编码，reshape 转为 100*100，并开启抗锯齿（ANTIALIAS）
-        对 reshape 后的图片分别使用 base64 与 md5 进行编码，以 JSON 格式返回，参数与返回格式如下
+	# TODO: 完成接受 HTTP_URL 的 picture_reshape
+	# TODO: 完成接受相对路径的 picture_reshape
+	@app.route('/pic', methods=['GET'])
+	def picture_reshape():
+		"""
+		**请使用 PIL 进行本函数的编写**
+		获取请求的 query_string 中携带的 b64_url 值
+		从 b64_url 下载一张图片的 base64 编码，reshape 转为 100*100，并开启抗锯齿（ANTIALIAS）
+		对 reshape 后的图片分别使用 base64 与 md5 进行编码，以 JSON 格式返回，参数与返回格式如下
         
         :param: b64_url: 
             本题的 b64_url 以 arguments 的形式给出，可能会出现两种输入
@@ -66,42 +66,42 @@ def create_app():
             "base64_picture": <图片reshape后的base64编码: str>
         }
         """
-        text = request.args.get('b64_url')
+		text = request.args.get('b64_url')
 
-        #get base64
+        #get original base64
         #if xxx.txt
-        if "img" is b64_url or "img" is text or "img.txt" is b64_url or "img.txt" is text:
-            file0 = open("img.txt","rb")
-            b64 = file0.read()
-            file0.close()
-        #if url
-        else:
-            b64 = text
-        #decode to jpg
-        imgdata=base64.b64decode(b64)  
-        file1=open("img.png","wb")  
-        file1.write(imgdata)  
-        file1.close()
+		if "http" not in text:
+			file0 = open("img.txt","rb")
+			b64 = file0.read()
+			file0.close()
+		#if url
+		else:
+			b64 = requests.get(text)
+        #decode to png
+		imgdata = base64.b64decode(b64)  
+		file1 = open("img.png","wb")  
+		file1.write(imgdata)  
+		file1.close()
         #reshape&save:
-        img = Image.open("img.png")
-        out = img.resize((100, 100),Image.ANTIALIAS)
-        out.save("img-reshaped.png", "png")
+		img = Image.open("img.png")
+		out = img.resize((100, 100),Image.ANTIALIAS)
+		out.save("img-reshaped.png", "png")
         #get original bytes
-        file2 = open("img-reshaped.png", "rb")
-        originBytes = file2.read()
-        file2.close()
-        #change to b64
-        bs64Code = base64.b64encode(originBytes)
-        #change to md5
-        encoder = hashlib.md5();
-        encoder.update(originBytes)#.encode(encoding='utf-8'))
-        md5Code = encoder.hexdigest()
-        return json.dumps({"md5":md5Code,"base64_picture":bs64Code})
+		file2 = open("img-reshaped.png", "rb")
+		originBytes = file2.read()
+		file2.close()
+		#change to b64
+		bs64Code = base64.b64encode(originBytes)
+		#change to md5
+		encoder = hashlib.md5()
+		encoder.update(originBytes)#.encode(encoding='utf-8'))
+		md5Code = encoder.hexdigest()
+		return json.dumps({"md5":md5Code,"base64_picture":bs64Code})
 
     # TODO: 爬取 996.icu Repo，获取企业名单
-    @app.route('/996')
-    def company_996():
-        """
+	@app.route('/996')
+	def company_996():
+		"""
         从 github.com/996icu/996.ICU 项目中获取所有的已确认是996的公司名单，并
 
         :return: 以 JSON List 的格式返回，格式如下
@@ -112,28 +112,28 @@ def create_app():
             "description": <description 描述>
         }, ...]
         """
-        code = requests.get("https://github.com/996icu/996.ICU/blob/master/blacklist/README.md").content
-        originalResult = re.findall(r'<td align="center">(.*)</td>',code.decode("utf-8"))[35::]
-        ansList = []
-        dictionary = {}
-        for i in range(len(originalResult)):
-            flag = i%5
-            item = originalResult[i]
-            if flag==0:
-                dictionary.update({"city":item})
-            elif flag==1:
-                templist = re.findall(r'>(.*)</a>',item)
-                if len(templist)==0:
-                    dictionary.update({"company":item})
-                else:
-                    dictionary.update({"company":templist[0]})
-            elif flag==2:
-                dictionary.update({"exposure_time":item})
-            elif flag==3:
-                dictionary.update({"description":item})
-            elif flag==4:
-                ansList.append(dictionary.copy())
-                dictionary.clear()
-        return json.dumps(ansList)
+		code = requests.get("https://github.com/996icu/996.ICU/blob/master/blacklist/README.md").content
+		originalResult = re.findall(r'<td align="center">(.*)</td>',code.decode("utf-8"))[35::]
+		ansList = []
+		dictionary = {}
+		for i in range(len(originalResult)):
+			flag = i % 5
+			item = originalResult[i]
+			if flag == 0:
+				dictionary.update({"city":item})
+			elif flag == 1:
+				templist = re.findall(r'>(.*)</a>',item)
+				if len(templist) == 0:
+					dictionary.update({"company":item})
+				else:
+					dictionary.update({"company":templist[0]})
+			elif flag == 2:
+				dictionary.update({"exposure_time":item})
+			elif flag == 3:
+				dictionary.update({"description":item})
+			elif flag == 4:
+				ansList.append(dictionary.copy())
+				dictionary.clear()
+		return json.dumps(ansList)
 
-    return app
+	return app
