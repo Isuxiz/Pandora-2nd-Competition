@@ -88,7 +88,8 @@ def create_app():
 			encoder = hashlib.md5()
 			encoder.update(originBytes)#.encode(encoding='utf-8'))
 			md5Code = encoder.hexdigest()
-			return jsonify({"md5":md5Code,"base64_picture":bs64Code})
+			dictionary = {"md5":md5Code,"base64_picture":bs64Code}
+			return jsonify(dictionary)
 
 	# TODO: 爬取 996.icu Repo，获取企业名单
 	@app.route('/996')
