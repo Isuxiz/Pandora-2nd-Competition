@@ -1,30 +1,17 @@
 from flask import Flask
-from flask import abort
-from flask import redirect
-from flask import request
-from flask import render_template
-import json
-import flask
-import PIL
-from PIL import Image
-import base64
-import hashlib
-import requests
-from bs4 import BeautifulSoupimport 
-from lxml import etree
-import pyquery
-import pprint
-import pytest
-import requests
-import re
 
 def create_app():
+	from flask import abort
+	from flask import request
+	from flask import render_template
 	app = Flask(__name__)
 
 	@app.route('/<path:url>')
 	def abort404(url):
 		if url not in {'pic','996',''}:
 			abort(404)
+		else:
+			pass	
 
 	@app.route('/')
 	def index():
@@ -64,6 +51,12 @@ def create_app():
 			"base64_picture": <图片reshape后的base64编码: str>
 		}
 		"""
+		import PIL
+		from PIL import Image
+		import base64
+		import hashlib
+		import requests
+		import json
 		text = request.args.get('b64_url')
 
 		#get original base64
@@ -110,6 +103,9 @@ def create_app():
 			"description": <description 描述>
 		}, ...]
 		"""
+		import requests
+		import json
+		import re
 		code = requests.get("https://github.com/996icu/996.ICU/blob/master/blacklist/README.md").content
 		originalResult = re.findall(r'<td align="center">(.*)</td>',code.decode("utf-8"))[35::]
 		ansList = []
