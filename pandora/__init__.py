@@ -25,8 +25,6 @@ def create_app():
 	def abort404(url):
 		if url not in {'pic','996',''}:
 			abort(404)
-		else:
-			redirect('/' + url)
 
 	@app.route('/')
 	def index():
