@@ -53,23 +53,23 @@ def create_app():
 		获取请求的 query_string 中携带的 b64_url 值
 		从 b64_url 下载一张图片的 base64 编码，reshape 转为 100*100，并开启抗锯齿（ANTIALIAS）
 		对 reshape 后的图片分别使用 base64 与 md5 进行编码，以 JSON 格式返回，参数与返回格式如下
-        
-        :param: b64_url: 
-            本题的 b64_url 以 arguments 的形式给出，可能会出现两种输入
-            1. 一个 HTTP URL，指向一张 PNG 图片的 base64 编码结果
-            2. 一个 TXT 文本文件的文件名，该 TXT 文本文件包含一张 PNG 图片的 base64 编码结果
-                此 TXT 需要通过 SSH 从服务器中获取，并下载到`pandora`文件夹下，具体请参考挑战说明
-        
-        :return: JSON
-        {
-            "md5": <图片reshape后的md5编码: str>,
-            "base64_picture": <图片reshape后的base64编码: str>
-        }
-        """
+		
+		:param: b64_url: 
+			本题的 b64_url 以 arguments 的形式给出，可能会出现两种输入
+			1. 一个 HTTP URL，指向一张 PNG 图片的 base64 编码结果
+			2. 一个 TXT 文本文件的文件名，该 TXT 文本文件包含一张 PNG 图片的 base64 编码结果
+				此 TXT 需要通过 SSH 从服务器中获取，并下载到`pandora`文件夹下，具体请参考挑战说明
+		
+		:return: JSON
+		{
+			"md5": <图片reshape后的md5编码: str>,
+			"base64_picture": <图片reshape后的base64编码: str>
+		}
+		"""
 		text = request.args.get('b64_url')
 
-        #get original base64
-        #if xxx.txt
+		#get original base64
+		#if xxx.txt
 		if "http" not in text:
 			file0 = open("img.txt","rb")
 			b64 = file0.read()
@@ -77,16 +77,16 @@ def create_app():
 		#if url
 		else:
 			b64 = requests.get(text)
-        #decode to png
+		#decode to png
 		imgdata = base64.b64decode(b64)  
 		file1 = open("img.png","wb")  
 		file1.write(imgdata)  
 		file1.close()
-        #reshape&save:
+		#reshape&save:
 		img = Image.open("img.png")
 		out = img.resize((100, 100),Image.ANTIALIAS)
 		out.save("img-reshaped.png", "png")
-        #get original bytes
+		#get original bytes
 		file2 = open("img-reshaped.png", "rb")
 		originBytes = file2.read()
 		file2.close()
@@ -98,20 +98,20 @@ def create_app():
 		md5Code = encoder.hexdigest()
 		return json.dumps({"md5":md5Code,"base64_picture":bs64Code})
 
-    # TODO: 爬取 996.icu Repo，获取企业名单
+	# TODO: 爬取 996.icu Repo，获取企业名单
 	@app.route('/996')
 	def company_996():
 		"""
-        从 github.com/996icu/996.ICU 项目中获取所有的已确认是996的公司名单，并
+		从 github.com/996icu/996.ICU 项目中获取所有的已确认是996的公司名单，并
 
-        :return: 以 JSON List 的格式返回，格式如下
-        [{
-            "city": <city_name 城市名称>,
-            "company": <company_name 公司名称>,
-            "exposure_time": <exposure_time 曝光时间>,
-            "description": <description 描述>
-        }, ...]
-        """
+		:return: 以 JSON List 的格式返回，格式如下
+		[{
+			"city": <city_name 城市名称>,
+			"company": <company_name 公司名称>,
+			"exposure_time": <exposure_time 曝光时间>,
+			"description": <description 描述>
+		}, ...]
+		"""
 		code = requests.get("https://github.com/996icu/996.ICU/blob/master/blacklist/README.md").content
 		originalResult = re.findall(r'<td align="center">(.*)</td>',code.decode("utf-8"))[35::]
 		ansList = []
