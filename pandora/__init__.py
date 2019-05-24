@@ -69,7 +69,8 @@ def create_app():
 				b64 = urlopen(text).read()
 			#if xxx.txt
 			else:
-				with open(r"./pandora/" + text, "rb") as file:
+				#add static to find static file
+				with open(os.path.join(app.root_path, 'static', text), "rb") as file:
 					b64 = file.read()
 			#decode to png & get bytes
 			imageBytes = io.BytesIO(base64.b64decode(b64)) 
