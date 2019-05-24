@@ -53,42 +53,39 @@ def create_app():
 		"""
 		import PIL
 		from PIL import Image
+		import os
+		import io
 		import base64
 		import hashlib
 		import requests
+		from urllib.request import urlopen
 		from flask import jsonify
 		if request.method == 'GET':
-			#text = request.args['b64_url']
-			text = str(request.query_string, 'utf-8')
+			text = request.args['b64_url']	#text = str(request.query_string, 'utf-8')
 			#get original base64
-			#if xxx.txt
-			if "http" not in text:
-				file0 = open(text, "rb")
-				b64 = file0.read()
-				file0.close()
 			#if url
+			if text[0:4] == "http":
+				#b64 = requests.get(text).content()
+				b64 = urlopen(text).read()
+			#if xxx.txt
 			else:
-				b64 = requests.get(text).content()
-			#decode to png
-			imgdata = base64.b64decode(b64)  
-			file1 = open("img.png","wb")  
-			file1.write(imgdata)  
-			file1.close()
-			#reshape&save:
-			img = Image.open("img.png")
+				with open(r"./pandora/" + text, "rb") as file:
+					b64 = file.read()
+			#decode to png & get bytes
+			imageBytes = io.BytesIO(base64.b64decode(b64)) 
+			#reshape & save bytes:
+			img = Image.open(imageBytes)
 			out = img.resize((100, 100),Image.ANTIALIAS)
-			out.save("img-reshaped.png", "png")
-			#get original bytes
-			file2 = open("img-reshaped.png", "rb")
-			originBytes = file2.read()
-			file2.close()
-			#change to b64
-			bs64Code = str(base64.b64encode(originBytes), 'utf-8')
-			#change to md5
+			reshapedBytes = io.BytesIO()
+			out.save(reshapedBytes, "png")
+			#encode to b64
+			bs64Code = base64.b64encode(reshapedBytes.getvalue()).decode()
+			#encode to md5
 			encoder = hashlib.md5()
-			encoder.update(originBytes)#.encode(encoding='utf-8'))
+			encoder.update(reshapedBytes.getvalue())#.encode(encoding='utf-8'))
 			md5Code = encoder.hexdigest()
 			dictionary = {"md5":md5Code,"base64_picture":bs64Code}
+			app.config['JSON_AS_ASCII'] = False
 			return jsonify(dictionary)
 
 	# TODO: 爬取 996.icu Repo，获取企业名单
